@@ -117,6 +117,10 @@ void tg_init(tetris_game *obj, int rows, int cols)
   obj->falling.ori = 0;
   obj->falling.loc.row = 0;
   obj->falling.loc.col = 0;
+  obj->next.typ = random_tetromino();
+  obj->next.ori = 0;
+  obj->next.loc.row = 0;
+  obj->next.loc.col = 0;
 }
 
 tetris_game *tg_create(int rows, int cols)
@@ -188,10 +192,11 @@ bool tg_fits(tetris_game *obj, tetris_block block)
 static void tg_new_falling(tetris_game *obj)
 {
   // Put in a new falling tetromino.
-  obj->falling.typ = random_tetromino();
-  obj->falling.ori = 0;
-  obj->falling.loc.row = 0;
-  obj->falling.loc.col = 0;
+  obj->falling = obj->next;
+  obj->next.typ = random_tetromino();
+  obj->next.ori = 0;
+  obj->next.loc.row = 0;
+  obj->next.loc.col = 0;
   // TODO - if new block fails, game over.
 }
 
@@ -353,16 +358,25 @@ void tg_print(tetris_game *obj, FILE *f) {
 
 void tg_curses(tetris_game *obj)
 {
-  int i, j;
+  int i, j, b;
 
+  // Top border and border around next block.
+  move(0,0);
   addch(ACS_ULCORNER);
   for (i = 0; i < obj->cols; i++)
+    addch(ACS_HLINE);
+  addch(ACS_TTEE);
+  for (i = 0; i < TETRIS; i++)
     addch(ACS_HLINE);
   addch(ACS_URCORNER);
   addch('\n');
 
+  // Game board area
   for (i = 0; i < obj->rows; i++) {
+    // left border
     addch(ACS_VLINE);
+
+    // game cells
     for (j = 0; j < obj->cols; j++) {
       if (TG_IS_EMPTY(tg_get(obj, i, j))) {
         addch(TG_EMPTY_CURS);
@@ -370,10 +384,46 @@ void tg_curses(tetris_game *obj)
         addch(TG_BLOCK_CURS(tg_get(obj, i, j)));
       }
     }
-    addch(ACS_VLINE);
+
+    // to the right of the game:
+    if (i < 4) {
+      // fill in the next block space
+      addch(ACS_VLINE);
+      for (j = 0; j < TETRIS; j++) {
+        bool displayed = false;
+        for (b = 0; b < TETRIS; b++) {
+          tetris_location c = TETROMINOS[obj->next.typ][obj->next.ori][b];
+          if (c.row == i && c.col == j) {
+            addch(TG_BLOCK_CURS(TET_TO_BLCK(obj->next.typ)));
+            displayed = true;
+          }
+        }
+        if (!displayed)
+          addch(TG_EMPTY_CURS);
+      }
+      // right border
+      addch(ACS_VLINE);
+    } else if (i == 4) {
+      // fill border under next block space
+      addch(ACS_LTEE);
+      for (j = 0; j < TETRIS; j++) {
+        addch(ACS_HLINE);
+      }
+      addch(ACS_LRCORNER);
+    } else if (i == 5) {
+      addch(ACS_VLINE);
+      printw("Score", obj->points);
+    } else if (i == 6) {
+      addch(ACS_VLINE);
+      printw("%d", obj->points);
+    } else {
+      // just put the right border in
+      addch(ACS_VLINE);
+    }
     addch('\n');
   }
 
+  // Lower border
   addch(ACS_LLCORNER);
   for (i = 0; i < obj->cols; i++)
     addch(ACS_HLINE);

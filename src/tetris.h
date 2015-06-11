@@ -78,6 +78,7 @@ typedef struct {
   int points;
   int level;
   tetris_block falling;
+  tetris_block next;
   int ticks_till_gravity;
 
 } tetris_game;

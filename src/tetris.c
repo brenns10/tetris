@@ -18,6 +18,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
+#include <ncurses.h>
 
 #include "tetris.h"
 
@@ -223,6 +224,22 @@ void tg_print(tetris_game *obj, FILE *f) {
     }
     fputc('\n', f);
   }
+}
+
+void tg_curses(tetris_game *obj)
+{
+  int i, j;
+  for (i = 0; i < obj->rows; i++) {
+    for (j = 0; j < obj->cols; j++) {
+      if (tg_get(obj, i, j) == TG_EMPTY) {
+        addch(TG_EMPTY_CURS);
+      } else {
+        addch(TG_BLOCK_CURS);
+      }
+    }
+    addch('\n');
+  }
+  refresh();
 }
 
 int random_tetromino(void) {

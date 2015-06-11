@@ -18,7 +18,7 @@ CC=gcc
 FLAGS=-Wall -pedantic
 INC=-Isrc/
 CFLAGS=$(FLAGS) -c -g --std=c99 $(INC)
-LFLAGS=$(FLAGS)
+LFLAGS=$(FLAGS) -lncurses
 DIR_GUARD=@mkdir -p $(@D)
 
 # Build configurations.

@@ -4,3 +4,4 @@ bin
 GTAGS
 GRTAGS
 GPATH
+Makefile.deps

@@ -45,20 +45,20 @@ OBJECTS=$(patsubst src/%.c,obj/$(CFG)/%.o,$(SOURCES))
 # Main targets
 .PHONY: all clean clean_all
 
-all: bin/$(CFG)/main GTAGS
+all: Makefile.deps bin/$(CFG)/main GTAGS
+
+Makefile.deps: $(SOURCES)
+	$(CC) $(CFLAGS) -MM $(SOURCES) > Makefile.deps
+	make
 
 GTAGS: $(SOURCES)
 	gtags
 
 clean:
-	rm -rf bin/$(CFG)/* obj/$(CFG)/* src/*.gch
+	rm -rf bin/$(CFG)/* obj/$(CFG)/* src/*.gch GTAGS GPATH GRTAGS Makefile.deps
 
 clean_all:
 	rm -rf bin/* obj/*
-
-# Explicit dependencies in the sources.
-src/tetris.c: src/tetris.h
-src/main.c: src/tetris.h
 
 # --- Compile Rule
 obj/$(CFG)/%.o: src/%.c
@@ -69,3 +69,5 @@ obj/$(CFG)/%.o: src/%.c
 bin/$(CFG)/main: $(OBJECTS)
 	$(DIR_GUARD)
 	$(CC) $(LFLAGS) $(OBJECTS) -o bin/$(CFG)/main
+
+-include Makefile.deps

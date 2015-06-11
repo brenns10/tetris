@@ -288,6 +288,43 @@ static void tg_handle_move(tetris_game *obj, tetris_move move)
   }
 }
 
+static bool tg_line_full(tetris_game *obj, int i)
+{
+  int j;
+  for (j = 0; j < obj->cols; j++) {
+    if (TG_IS_EMPTY(tg_get(obj, i, j)))
+      return false;
+  }
+  return true;
+}
+
+static void tg_shift_lines(tetris_game *obj, int r)
+{
+  int i, j;
+  for (i = r-1; i >= 0; i--) {
+    for (j = 0; j < obj->cols; j++) {
+      tg_set(obj, i+1, j, tg_get(obj, i, j));
+      tg_set(obj, i, j, TG_EMPTY);
+    }
+  }
+}
+
+static void tg_check_lines(tetris_game *obj)
+{
+  int i;
+  tg_remove(obj, obj->falling); // don't want to mess up falling block
+
+  for (i = obj->rows-1; i >= 0; i--) {
+    if (tg_line_full(obj, i)) {
+      tg_shift_lines(obj, i);
+      obj->points++;
+      i++; // do this line over again since they're shifted
+    }
+  }
+
+  tg_put(obj, obj->falling); // replace
+}
+
 void tg_tick(tetris_game *obj, tetris_move move)
 {
   // Handle gravity.
@@ -295,6 +332,9 @@ void tg_tick(tetris_game *obj, tetris_move move)
 
   // Handle input.
   tg_handle_move(obj, move);
+
+  // Check for cleared lines
+  tg_check_lines(obj);
 }
 
 void tg_print(tetris_game *obj, FILE *f) {

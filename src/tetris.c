@@ -15,7 +15,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #include "tetris.h"
 
@@ -108,6 +110,8 @@ void tg_init(tetris_game *obj, int rows, int cols)
   memset(obj->board, TG_EMPTY, rows * cols);
   obj->points = 0;
   obj->level = 1;
+  obj->ticks_till_gravity = TICKS_PER_GRAVITY;
+  srand(ctime(NULL));
 }
 
 tetris_game *tg_create(int rows, int cols)
@@ -138,6 +142,11 @@ void tg_set(tetris_game *obj, int row, int column, char value)
   obj->board[obj->cols * row + column] = value;
 }
 
+bool tg_check(tetris_game *obj, int row, int co)l
+{
+  return 0 <= row && row < obj->rows && 0 <= col && col < obj->cols;
+}
+
 void tg_put(tetris_game *obj, tetris_block block)
 {
   int i;
@@ -156,6 +165,50 @@ void tg_remove(tetris_game *obj, tetris_block block)
   }
 }
 
+void tg_fits(tetris_game *obj, tetris_block block)
+{
+  int i, r, c;
+  for (i = 0; i < TETRIS; i++) {
+    tetris_location cell = TETROMINOS[block.typ][block.ori][i];
+    r = block.loc.row + cell.row;
+    c = block.loc.col + cell.col;
+    if (!tg_check(obj, r, c) || tg_get(obj, r, c) == TB_BLOCK) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void tg_tick(tetris_game *obj, tetris_move move)
+{
+  tetris_block block;
+
+  // Handle gravity.
+  obj->ticks_till_gravity--;
+  if (obj->ticks_till_gravity <= 0) {
+    tg_remove(obj, obj->falling);
+    obj->falling.loc.row++;
+    if (tg_fits(obj, obj->falling)) {
+      obj->ticks_till_gravity = TICKS_PER_GRAVITY;
+    } else {
+      obj->falling.loc.row--;
+      tg_put(obj, obj->falling);
+
+      // Put in a new falling tetromino.
+      obj->falling.typ = random_tetromino();
+      obj->falling.ori = 0;
+      obj->falling.loc.row = 0;
+      obj->falling.loc.col = 0;
+
+      // TODO - if new block fails, game over.
+    }
+    tg_put(obj, obj->falling);
+  }
+
+  // Handle input.
+  // TODO
+}
+
 void tg_print(tetris_game *obj, FILE *f) {
   int i, j;
   for (i = 0; i < obj->rows; i++) {
@@ -168,4 +221,8 @@ void tg_print(tetris_game *obj, FILE *f) {
     }
     fputc('\n', f);
   }
+}
+
+int random_tetromino() {
+  return rand() % NUM_TETROMINOS;
 }

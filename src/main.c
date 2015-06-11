@@ -40,7 +40,7 @@ int curses_main()
   // Game loop
   while (running) {
     move(0,0);
-    tg_tick(tg, move);
+    running = tg_tick(tg, move);
     tg_curses(tg);
     sleep_milli(10);
 
@@ -58,14 +58,19 @@ int curses_main()
       move = TM_DROP;
       break;
     case 'q':
-      tg_delete(tg);
       running = false;
     default:
       move = TM_NONE;
     }
   }
 
+  printw("\nGame over!\n");
+  printw("You finished with %d points on level %d.\n", tg->points, tg->level);
+  printw("Press any key to exit.");
+  timeout(-1);
+  getch();
   endwin();
+  tg_delete(tg);
   return 0;
 }
 

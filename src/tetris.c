@@ -288,7 +288,23 @@ static void tg_check_lines(tetris_game *obj)
   tg_put(obj, obj->falling); // replace
 }
 
-void tg_tick(tetris_game *obj, tetris_move move)
+static bool tg_game_over(tetris_game *obj)
+{
+  int i, j;
+  bool over = false;
+  tg_remove(obj, obj->falling);
+  for (i = 0; i < 2; i++) {
+    for (j = 0; j < obj->cols; j++) {
+      if (TG_IS_BLOCK(tg_get(obj, i, j))) {
+        over = true;
+      }
+    }
+  }
+  tg_put(obj, obj->falling);
+  return over;
+}
+
+bool tg_tick(tetris_game *obj, tetris_move move)
 {
   // Handle gravity.
   tg_do_gravity_tick(obj);
@@ -298,6 +314,9 @@ void tg_tick(tetris_game *obj, tetris_move move)
 
   // Check for cleared lines
   tg_check_lines(obj);
+
+  // Return whether the game will continue (NOT whether it's over)
+  return !tg_game_over(obj);
 }
 
 void tg_print(tetris_game *obj, FILE *f) {

@@ -23,24 +23,39 @@
 
 int curses_main()
 {
-  tetris_game *tg = tg_create(10, 10);
+  tetris_game *tg = tg_create(22, 10);
+  tetris_move move;
 
   // NCURSES initialization:
   initscr();             // initialize curses
   cbreak();              // pass key presses to program, but not signals
   noecho();              // don't echo key presses to screen
   keypad(stdscr, TRUE);  // allow arrow keys
-  timeout(0);           // no blocking on getch()
+  timeout(0);            // no blocking on getch()
+  curs_set(0);           // set the cursor to invisible
 
   // Game loop
   while (true) {
     move(0,0);
-    tg_tick(tg, TM_LEFT);
+    tg_tick(tg, move);
     tg_curses(tg);
     sleep_milli(10);
-    if (getch() != ERR) {
-      printw("input");
+
+    switch (getch()) {
+    case KEY_LEFT:
+      move = TM_LEFT;
       break;
+    case KEY_RIGHT:
+      move = TM_RIGHT;
+      break;
+    case KEY_UP:
+      move = TM_CLOCK;
+      break;
+    case KEY_DOWN:
+      move = TM_DROP;
+      break;
+    default:
+      move = TM_NONE;
     }
   }
 

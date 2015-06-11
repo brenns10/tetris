@@ -184,9 +184,18 @@ bool tg_fits(tetris_game *obj, tetris_block block)
   return true;
 }
 
-void tg_tick(tetris_game *obj, tetris_move move)
+static void tg_new_falling(tetris_game *obj)
 {
-  // Handle gravity.
+  // Put in a new falling tetromino.
+  obj->falling.typ = random_tetromino();
+  obj->falling.ori = 0;
+  obj->falling.loc.row = 0;
+  obj->falling.loc.col = 0;
+  // TODO - if new block fails, game over.
+}
+
+static void tg_do_gravity_tick(tetris_game *obj)
+{
   obj->ticks_till_gravity--;
   if (obj->ticks_till_gravity <= 0) {
     tg_remove(obj, obj->falling);
@@ -197,19 +206,58 @@ void tg_tick(tetris_game *obj, tetris_move move)
       obj->falling.loc.row--;
       tg_put(obj, obj->falling);
 
-      // Put in a new falling tetromino.
-      obj->falling.typ = random_tetromino();
-      obj->falling.ori = 0;
-      obj->falling.loc.row = 0;
-      obj->falling.loc.col = 0;
-
-      // TODO - if new block fails, game over.
+      tg_new_falling(obj);
     }
     tg_put(obj, obj->falling);
   }
+}
+
+static void tg_move(tetris_game *obj, int direction)
+{
+  tg_remove(obj, obj->falling);
+  obj->falling.loc.col += direction;
+  if (!tg_fits(obj, obj->falling)) {
+    obj->falling.loc.col -= direction;
+  }
+  tg_put(obj, obj->falling);
+}
+
+static void tg_down(tetris_game *obj)
+{
+  tg_remove(obj, obj->falling);
+  while (tg_fits(obj, obj->falling)) {
+    obj->falling.loc.row++;
+  }
+  obj->falling.loc.row--;
+  tg_put(obj, obj->falling);
+  tg_new_falling(obj);
+}
+
+static void tg_handle_move(tetris_game *obj, tetris_move move)
+{
+  switch (move) {
+  case TM_LEFT:
+    tg_move(obj, -1);
+    break;
+  case TM_RIGHT:
+    tg_move(obj, 1);
+    break;
+  case TM_DROP:
+    tg_down(obj);
+    break;
+  default:
+    // pass
+    break;
+  }
+}
+
+void tg_tick(tetris_game *obj, tetris_move move)
+{
+  // Handle gravity.
+  tg_do_gravity_tick(obj);
 
   // Handle input.
-  // TODO
+  tg_handle_move(obj, move);
 }
 
 void tg_print(tetris_game *obj, FILE *f) {

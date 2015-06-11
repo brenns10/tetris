@@ -55,7 +55,7 @@ typedef struct {
 } tetris_block;
 
 typedef enum {
-  TM_LEFT, TM_RIGHT, TM_CLOCK, TM_COUNTER, TM_DROP
+  TM_LEFT, TM_RIGHT, TM_CLOCK, TM_COUNTER, TM_DROP, TM_NONE
 } tetris_move;
 
 typedef struct {

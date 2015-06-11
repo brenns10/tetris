@@ -233,6 +233,36 @@ static void tg_down(tetris_game *obj)
   tg_new_falling(obj);
 }
 
+static void tg_rotate(tetris_game *obj, int direction)
+{
+  tg_remove(obj, obj->falling);
+
+  while (true) {
+    obj->falling.ori = (obj->falling.ori + direction) % NUM_ORIENTATIONS;
+
+    // If the new orientation fits, we're done.
+    if (tg_fits(obj, obj->falling))
+      break;
+
+    // Otherwise, try moving left to make it fit.
+    obj->falling.loc.col--;
+    if (tg_fits(obj, obj->falling))
+      break;
+
+    // Finally, try moving right to make it fit.
+    obj->falling.loc.col += 2;
+    if (tg_fits(obj, obj->falling))
+      break;
+
+    // Put it back in its original location and try the next orientation.
+    obj->falling.loc.col--;
+    // Worst case, we come back to the original orientation and it fits, so this
+    // loop will terminate.
+  }
+
+  tg_put(obj, obj->falling);
+}
+
 static void tg_handle_move(tetris_game *obj, tetris_move move)
 {
   switch (move) {
@@ -244,6 +274,12 @@ static void tg_handle_move(tetris_game *obj, tetris_move move)
     break;
   case TM_DROP:
     tg_down(obj);
+    break;
+  case TM_CLOCK:
+    tg_rotate(obj, 1);
+    break;
+  case TM_COUNTER:
+    tg_rotate(obj, -1);
     break;
   default:
     // pass

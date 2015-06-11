@@ -8,6 +8,8 @@ stretch goals I may pick up in my free time.
 Instructions
 ------------
 
+If you're on Ubuntu, you may need to `sudo apt-get install libncurses5-dev`.
+
 To build, all you need to do is run `make`.  Then run `bin/release/main` to play
 the game.
 

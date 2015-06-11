@@ -45,7 +45,7 @@ void boss_mode(void)
   timeout(-1);
   while (getch() != KEY_F(1));
   timeout(0);
-
+  noecho();
 }
 
 int main(int argc, char **argv)

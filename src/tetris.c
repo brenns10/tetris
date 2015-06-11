@@ -67,6 +67,16 @@ int GRAVITY_LEVEL[MAX_LEVEL+1] = {
   30, 28, 26, 24, 22, 20, 16, 12,  8,  4
 };
 
+static void tg_new_falling(tetris_game *obj)
+{
+  // Put in a new falling tetromino.
+  obj->falling = obj->next;
+  obj->next.typ = random_tetromino();
+  obj->next.ori = 0;
+  obj->next.loc.row = 0;
+  obj->next.loc.col = obj->cols/2 - 2;
+}
+
 void tg_init(tetris_game *obj, int rows, int cols)
 {
   // Initialization logic
@@ -77,16 +87,11 @@ void tg_init(tetris_game *obj, int rows, int cols)
   obj->points = 0;
   obj->level = 0;
   obj->ticks_till_gravity = GRAVITY_LEVEL[obj->level];
-  srand(time(NULL));
-  obj->falling.typ = random_tetromino();
-  obj->falling.ori = 0;
-  obj->falling.loc.row = 0;
-  obj->falling.loc.col = 0;
-  obj->next.typ = random_tetromino();
-  obj->next.ori = 0;
-  obj->next.loc.row = 0;
-  obj->next.loc.col = 0;
   obj->lines_remaining = LINES_PER_LEVEL;
+  srand(time(NULL));
+  tg_new_falling(obj);
+  tg_new_falling(obj);
+  printf("%d", obj->falling.loc.col);
 }
 
 tetris_game *tg_create(int rows, int cols)
@@ -153,17 +158,6 @@ bool tg_fits(tetris_game *obj, tetris_block block)
     }
   }
   return true;
-}
-
-static void tg_new_falling(tetris_game *obj)
-{
-  // Put in a new falling tetromino.
-  obj->falling = obj->next;
-  obj->next.typ = random_tetromino();
-  obj->next.ori = 0;
-  obj->next.loc.row = 0;
-  obj->next.loc.col = 0;
-  // TODO - if new block fails, game over.
 }
 
 static void tg_do_gravity_tick(tetris_game *obj)

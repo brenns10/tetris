@@ -25,7 +25,7 @@
 int main(int argc, char **argv)
 {
   tetris_game *tg = tg_create(22, 10);
-  tetris_move move;
+  tetris_move move = TM_NONE;
   bool running = true;
 
   // NCURSES initialization:

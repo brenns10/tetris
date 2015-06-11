@@ -37,6 +37,8 @@
 #define TG_EMPTY_STR " "
 #define TG_BLOCK_STR "\u25AE"
 
+#define TICKS_PER_GRAVITY 30
+
 typedef struct {
   int row;
   int col;
@@ -50,6 +52,10 @@ typedef struct {
 
 } tetris_block;
 
+typedef enum {
+  TM_LEFT, TM_RIGHT, TM_CLOCK, TM_COUNTER, TM_DROP
+} tetris_move;
+
 typedef struct {
 
   int rows;
@@ -57,6 +63,8 @@ typedef struct {
   char *board;
   int points;
   int level;
+  tetris_block falling;
+  int ticks_till_gravity;
 
 } tetris_game;
 

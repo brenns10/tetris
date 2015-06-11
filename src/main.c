@@ -22,7 +22,7 @@
 #include "tetris.h"
 #include "util.h"
 
-int curses_main()
+int main(int argc, char **argv)
 {
   tetris_game *tg = tg_create(22, 10);
   tetris_move move;
@@ -72,31 +72,4 @@ int curses_main()
   endwin();
   tg_delete(tg);
   return 0;
-}
-
-int simple_main()
-{
-  tetris_game *tg = tg_create(10, 10);
-  tetris_block tb = {0, 0, {1, 1}};
-  for (tb.typ = 0; tb.typ < NUM_TETROMINOS; tb.typ++) {
-    for (tb.ori = 0; tb.ori < NUM_ORIENTATIONS; tb.ori++) {
-      tg_put(tg, tb);
-      tg_print(tg, stdout);
-      getchar();
-      printf("-------------------------\n");
-      tg_remove(tg, tb);
-    }
-  }
-  tg_print(tg, stdout);
-  tg_delete(tg);
-  return 0;
-}
-
-int main(int argc, char *argv[])
-{
-  if (argc >= 2 && strcmp(argv[1], "curses") == 0) {
-    return curses_main();
-  } else {
-    return simple_main();
-  }
 }

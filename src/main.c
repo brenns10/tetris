@@ -14,6 +14,7 @@
 *******************************************************************************/
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <time.h>
 #include <ncurses.h>
 #include <string.h>
@@ -25,6 +26,7 @@ int curses_main()
 {
   tetris_game *tg = tg_create(22, 10);
   tetris_move move;
+  bool running = true;
 
   // NCURSES initialization:
   initscr();             // initialize curses
@@ -35,7 +37,7 @@ int curses_main()
   curs_set(0);           // set the cursor to invisible
 
   // Game loop
-  while (true) {
+  while (running) {
     move(0,0);
     tg_tick(tg, move);
     tg_curses(tg);
@@ -54,6 +56,9 @@ int curses_main()
     case KEY_DOWN:
       move = TM_DROP;
       break;
+    case 'q':
+      tg_delete(tg);
+      running = false;
     default:
       move = TM_NONE;
     }

@@ -111,7 +111,7 @@ void tg_init(tetris_game *obj, int rows, int cols)
   obj->points = 0;
   obj->level = 1;
   obj->ticks_till_gravity = TICKS_PER_GRAVITY;
-  srand(ctime(NULL));
+  srand(time(NULL));
 }
 
 tetris_game *tg_create(int rows, int cols)
@@ -142,7 +142,7 @@ void tg_set(tetris_game *obj, int row, int column, char value)
   obj->board[obj->cols * row + column] = value;
 }
 
-bool tg_check(tetris_game *obj, int row, int co)l
+bool tg_check(tetris_game *obj, int row, int col)
 {
   return 0 <= row && row < obj->rows && 0 <= col && col < obj->cols;
 }
@@ -165,14 +165,14 @@ void tg_remove(tetris_game *obj, tetris_block block)
   }
 }
 
-void tg_fits(tetris_game *obj, tetris_block block)
+bool tg_fits(tetris_game *obj, tetris_block block)
 {
   int i, r, c;
   for (i = 0; i < TETRIS; i++) {
     tetris_location cell = TETROMINOS[block.typ][block.ori][i];
     r = block.loc.row + cell.row;
     c = block.loc.col + cell.col;
-    if (!tg_check(obj, r, c) || tg_get(obj, r, c) == TB_BLOCK) {
+    if (!tg_check(obj, r, c) || tg_get(obj, r, c) == TG_BLOCK) {
       return false;
     }
   }
@@ -181,8 +181,6 @@ void tg_fits(tetris_game *obj, tetris_block block)
 
 void tg_tick(tetris_game *obj, tetris_move move)
 {
-  tetris_block block;
-
   // Handle gravity.
   obj->ticks_till_gravity--;
   if (obj->ticks_till_gravity <= 0) {
@@ -223,6 +221,6 @@ void tg_print(tetris_game *obj, FILE *f) {
   }
 }
 
-int random_tetromino() {
+int random_tetromino(void) {
   return rand() % NUM_TETROMINOS;
 }

@@ -87,4 +87,7 @@ void tg_remove(tetris_game *obj, tetris_block block);
 // Debug stuff
 void tg_print(tetris_game *obj, FILE *f);
 
+// Other stuff
+int random_tetromino(void);
+
 #endif // TETRIS_H

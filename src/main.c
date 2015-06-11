@@ -35,6 +35,7 @@ int curses_main()
   keypad(stdscr, TRUE);  // allow arrow keys
   timeout(0);            // no blocking on getch()
   curs_set(0);           // set the cursor to invisible
+  tg_init_colors();      // setup tetris colors
 
   // Game loop
   while (running) {

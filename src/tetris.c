@@ -157,7 +157,8 @@ void tg_put(tetris_game *obj, tetris_block block)
   int i;
   for (i = 0; i < TETRIS; i++) {
     tetris_location cell = TETROMINOS[block.typ][block.ori][i];
-    tg_set(obj, block.loc.row + cell.row, block.loc.col + cell.col, TG_BLOCK);
+    tg_set(obj, block.loc.row + cell.row, block.loc.col + cell.col,
+           TET_TO_BLCK(block.typ));
   }
 }
 
@@ -177,7 +178,7 @@ bool tg_fits(tetris_game *obj, tetris_block block)
     tetris_location cell = TETROMINOS[block.typ][block.ori][i];
     r = block.loc.row + cell.row;
     c = block.loc.col + cell.col;
-    if (!tg_check(obj, r, c) || tg_get(obj, r, c) == TG_BLOCK) {
+    if (!tg_check(obj, r, c) || TG_IS_BLOCK(tg_get(obj, r, c))) {
       return false;
     }
   }
@@ -300,7 +301,7 @@ void tg_print(tetris_game *obj, FILE *f) {
   int i, j;
   for (i = 0; i < obj->rows; i++) {
     for (j = 0; j < obj->cols; j++) {
-      if (tg_get(obj, i, j) == TG_EMPTY) {
+      if (TG_IS_EMPTY(tg_get(obj, i, j))) {
         fputs(TG_EMPTY_STR, f);
       } else {
         fputs(TG_BLOCK_STR, f);
@@ -323,10 +324,10 @@ void tg_curses(tetris_game *obj)
   for (i = 0; i < obj->rows; i++) {
     addch(ACS_VLINE);
     for (j = 0; j < obj->cols; j++) {
-      if (tg_get(obj, i, j) == TG_EMPTY) {
+      if (TG_IS_EMPTY(tg_get(obj, i, j))) {
         addch(TG_EMPTY_CURS);
       } else {
-        addch(TG_BLOCK_CURS);
+        addch(TG_BLOCK_CURS(tg_get(obj, i, j)));
       }
     }
     addch(ACS_VLINE);
@@ -338,6 +339,19 @@ void tg_curses(tetris_game *obj)
     addch(ACS_HLINE);
   addch(ACS_LRCORNER);
   refresh();
+}
+
+void tg_init_colors(void)
+{
+  start_color();
+  //init_color(COLOR_ORANGE, 1000, 647, 0);
+  init_pair(TG_BLCKI, COLOR_CYAN, COLOR_BLACK);
+  init_pair(TG_BLCKJ, COLOR_BLUE, COLOR_BLACK);
+  init_pair(TG_BLCKL, COLOR_WHITE, COLOR_BLACK);
+  init_pair(TG_BLCKO, COLOR_YELLOW, COLOR_BLACK);
+  init_pair(TG_BLCKS, COLOR_GREEN, COLOR_BLACK);
+  init_pair(TG_BLCKT, COLOR_MAGENTA, COLOR_BLACK);
+  init_pair(TG_BLCKZ, COLOR_RED, COLOR_BLACK);
 }
 
 int random_tetromino(void) {

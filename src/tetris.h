@@ -20,9 +20,19 @@
 
 #define TETRIS 4
 
-#define TG_EMPTY   0x00
-#define TG_FALLING 0x01
-#define TG_BLOCK   0x02
+#define TG_EMPTY   0
+#define TG_BLCKI   1
+#define TG_BLCKJ   2
+#define TG_BLCKL   3
+#define TG_BLCKO   4
+#define TG_BLCKS   5
+#define TG_BLCKT   6
+#define TG_BLCKZ   7
+
+#define TET_TO_BLCK(x) ((x)+1)
+
+#define TG_IS_EMPTY(x) ((x) == TG_EMPTY)
+#define TG_IS_BLOCK(x) (!TG_IS_EMPTY(x))
 
 #define TET_I 0
 #define TET_J 1
@@ -37,9 +47,11 @@
 #define TG_EMPTY_STR " "
 #define TG_BLOCK_STR "\u2588"
 #define TG_EMPTY_CURS ' '
-#define TG_BLOCK_CURS (' '|A_REVERSE)
+#define TG_BLOCK_CURS(x) (' '|A_REVERSE|COLOR_PAIR(x))
 
 #define TICKS_PER_GRAVITY 30
+
+//#define COLOR_ORANGE 9
 
 typedef struct {
   int row;
@@ -90,8 +102,10 @@ void tg_tick(tetris_game *obj, tetris_move move);
 // printing stuff
 void tg_print(tetris_game *obj, FILE *f);
 void tg_curses(tetris_game *obj);
+void tg_init_colors(void);
 
 // Other stuff
 int random_tetromino(void);
+void tg_init_colors(void);
 
 #endif // TETRIS_H

@@ -59,6 +59,16 @@ int main(int argc, char **argv)
       break;
     case 'q':
       running = false;
+      move = TM_NONE;
+      break;
+    case 'p':
+      clear();
+      printw("PAUSED");
+      timeout(-1);
+      getch();
+      timeout(0);
+      move = TM_NONE;
+      break;
     default:
       move = TM_NONE;
     }

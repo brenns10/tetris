@@ -45,7 +45,10 @@ OBJECTS=$(patsubst src/%.c,obj/$(CFG)/%.o,$(SOURCES))
 # Main targets
 .PHONY: all clean clean_all
 
-all: bin/$(CFG)/main
+all: bin/$(CFG)/main GTAGS
+
+GTAGS: $(SOURCES)
+	gtags
 
 clean:
 	rm -rf bin/$(CFG)/* obj/$(CFG)/* src/*.gch

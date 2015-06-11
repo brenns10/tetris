@@ -112,6 +112,10 @@ void tg_init(tetris_game *obj, int rows, int cols)
   obj->level = 1;
   obj->ticks_till_gravity = TICKS_PER_GRAVITY;
   srand(time(NULL));
+  obj->falling.typ = random_tetromino();
+  obj->falling.ori = 0;
+  obj->falling.loc.row = 0;
+  obj->falling.loc.col = 0;
 }
 
 tetris_game *tg_create(int rows, int cols)

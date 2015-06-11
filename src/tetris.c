@@ -313,7 +313,15 @@ void tg_print(tetris_game *obj, FILE *f) {
 void tg_curses(tetris_game *obj)
 {
   int i, j;
+
+  addch(ACS_ULCORNER);
+  for (i = 0; i < obj->cols; i++)
+    addch(ACS_HLINE);
+  addch(ACS_URCORNER);
+  addch('\n');
+
   for (i = 0; i < obj->rows; i++) {
+    addch(ACS_VLINE);
     for (j = 0; j < obj->cols; j++) {
       if (tg_get(obj, i, j) == TG_EMPTY) {
         addch(TG_EMPTY_CURS);
@@ -321,8 +329,14 @@ void tg_curses(tetris_game *obj)
         addch(TG_BLOCK_CURS);
       }
     }
+    addch(ACS_VLINE);
     addch('\n');
   }
+
+  addch(ACS_LLCORNER);
+  for (i = 0; i < obj->cols; i++)
+    addch(ACS_HLINE);
+  addch(ACS_LRCORNER);
   refresh();
 }
 

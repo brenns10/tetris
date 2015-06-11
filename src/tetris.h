@@ -62,13 +62,21 @@ typedef struct {
 
 extern tetris_location TETROMINOS[NUM_TETROMINOS][NUM_ORIENTATIONS][TETRIS];
 
+// Data structure manipulation.
 void tg_init(tetris_game *obj, int rows, int cols);
 tetris_game *tg_create(int rows, int cols);
 void tg_destroy(tetris_game *obj);
 void tg_delete(tetris_game *obj);
 
+// Low level cell manipulation.
 char tg_get(tetris_game *obj, int row, int col);
 void tg_set(tetris_game *obj, int row, int col, char value);
+
+// Tetromino level manipulation.
+void tg_put(tetris_game *obj, tetris_block block);
+void tg_remove(tetris_game *obj, tetris_block block);
+
+// Debug stuff
 void tg_print(tetris_game *obj, FILE *f);
 
 #endif // TETRIS_H

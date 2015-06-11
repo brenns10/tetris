@@ -19,6 +19,9 @@
 #include <stdio.h> // for FILE
 #include <stdbool.h> // for bool
 
+#define MAX(X,Y) ((X) > (Y) ? (X) : (Y))
+#define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
+
 #define TETRIS 4
 
 #define TG_EMPTY   0
@@ -50,9 +53,8 @@
 #define TG_EMPTY_CURS ' '
 #define TG_BLOCK_CURS(x) (' '|A_REVERSE|COLOR_PAIR(x))
 
-#define TICKS_PER_GRAVITY 30
-
-//#define COLOR_ORANGE 9
+#define MAX_LEVEL 19
+#define LINES_PER_LEVEL 10
 
 typedef struct {
   int row;
@@ -81,10 +83,12 @@ typedef struct {
   tetris_block falling;
   tetris_block next;
   int ticks_till_gravity;
+  int lines_remaining;
 
 } tetris_game;
 
 extern tetris_location TETROMINOS[NUM_TETROMINOS][NUM_ORIENTATIONS][TETRIS];
+extern int GRAVITY_LEVEL[MAX_LEVEL+1];
 
 // Data structure manipulation.
 void tg_init(tetris_game *obj, int rows, int cols);

@@ -60,6 +60,13 @@ tetris_location TETROMINOS[NUM_TETROMINOS][NUM_ORIENTATIONS][TETRIS] = {
    {{0, 1}, {1, 0}, {1, 1}, {2, 0}}},
 };
 
+int GRAVITY_LEVEL[MAX_LEVEL+1] = {
+// 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,
+  50, 48, 46, 44, 42, 40, 38, 36, 34, 32,
+//10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+  30, 28, 26, 24, 22, 20, 16, 12,  8,  4
+};
+
 void tg_init(tetris_game *obj, int rows, int cols)
 {
   // Initialization logic
@@ -68,8 +75,8 @@ void tg_init(tetris_game *obj, int rows, int cols)
   obj->board = malloc(rows * cols);
   memset(obj->board, TG_EMPTY, rows * cols);
   obj->points = 0;
-  obj->level = 1;
-  obj->ticks_till_gravity = TICKS_PER_GRAVITY;
+  obj->level = 0;
+  obj->ticks_till_gravity = GRAVITY_LEVEL[obj->level];
   srand(time(NULL));
   obj->falling.typ = random_tetromino();
   obj->falling.ori = 0;
@@ -79,6 +86,7 @@ void tg_init(tetris_game *obj, int rows, int cols)
   obj->next.ori = 0;
   obj->next.loc.row = 0;
   obj->next.loc.col = 0;
+  obj->lines_remaining = LINES_PER_LEVEL;
 }
 
 tetris_game *tg_create(int rows, int cols)
@@ -165,7 +173,7 @@ static void tg_do_gravity_tick(tetris_game *obj)
     tg_remove(obj, obj->falling);
     obj->falling.loc.row++;
     if (tg_fits(obj, obj->falling)) {
-      obj->ticks_till_gravity = TICKS_PER_GRAVITY;
+      obj->ticks_till_gravity = GRAVITY_LEVEL[obj->level];
     } else {
       obj->falling.loc.row--;
       tg_put(obj, obj->falling);
@@ -272,20 +280,34 @@ static void tg_shift_lines(tetris_game *obj, int r)
   }
 }
 
-static void tg_check_lines(tetris_game *obj)
+static int tg_check_lines(tetris_game *obj)
 {
-  int i;
+  int i, nlines = 0;
   tg_remove(obj, obj->falling); // don't want to mess up falling block
 
   for (i = obj->rows-1; i >= 0; i--) {
     if (tg_line_full(obj, i)) {
       tg_shift_lines(obj, i);
-      obj->points++;
       i++; // do this line over again since they're shifted
+      nlines++;
     }
   }
 
   tg_put(obj, obj->falling); // replace
+  return nlines;
+}
+
+static void tg_adjust_score(tetris_game *obj, int lines_cleared)
+{
+  static int line_multiplier[] = {0, 40, 100, 300, 1200};
+  obj->points += line_multiplier[lines_cleared] * (obj->level + 1);
+  if (lines_cleared >= obj->lines_remaining) {
+    obj->level = MIN(MAX_LEVEL, obj->level + 1);
+    lines_cleared -= obj->lines_remaining;
+    obj->lines_remaining = LINES_PER_LEVEL - lines_cleared;
+  } else {
+    obj->lines_remaining -= lines_cleared;
+  }
 }
 
 static bool tg_game_over(tetris_game *obj)
@@ -306,6 +328,7 @@ static bool tg_game_over(tetris_game *obj)
 
 bool tg_tick(tetris_game *obj, tetris_move move)
 {
+  int lines_cleared;
   // Handle gravity.
   tg_do_gravity_tick(obj);
 
@@ -313,7 +336,9 @@ bool tg_tick(tetris_game *obj, tetris_move move)
   tg_handle_move(obj, move);
 
   // Check for cleared lines
-  tg_check_lines(obj);
+  lines_cleared = tg_check_lines(obj);
+
+  tg_adjust_score(obj, lines_cleared);
 
   // Return whether the game will continue (NOT whether it's over)
   return !tg_game_over(obj);
@@ -389,10 +414,22 @@ void tg_curses(tetris_game *obj)
       addch(ACS_LRCORNER);
     } else if (i == 5) {
       addch(ACS_VLINE);
-      printw("Score", obj->points);
+      printw("Score");
     } else if (i == 6) {
       addch(ACS_VLINE);
       printw("%d", obj->points);
+    } else if (i == 7) {
+      addch(ACS_VLINE);
+      printw("Level");
+    } else if (i == 8) {
+      addch(ACS_VLINE);
+      printw("%d", obj->level);
+    } else if (i == 9) {
+      addch(ACS_VLINE);
+      printw("Lines");
+    } else if (i == 10) {
+      addch(ACS_VLINE);
+      printw("%d", obj->lines_remaining);
     } else {
       // just put the right border in
       addch(ACS_VLINE);

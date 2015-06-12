@@ -23,6 +23,19 @@
 #include "tetris.h"
 #include "util.h"
 
+/*
+  2 columns per cell makes the game much nicer.
+ */
+#define COLS_PER_CELL 2
+/*
+  Macro to print a cell of a specific type to a window.
+ */
+#define ADD_BLOCK(w,x) waddch((w),' '|A_REVERSE|COLOR_PAIR(x));     \
+                       waddch((w),' '|A_REVERSE|COLOR_PAIR(x))
+
+/*
+  Print the tetris board onto the ncurses window.
+ */
 void display_board(WINDOW *w, tetris_game *obj)
 {
   int i, j;
@@ -32,15 +45,18 @@ void display_board(WINDOW *w, tetris_game *obj)
   wmove(w,1,1);
   for (i = 0; i < obj->rows; i++) {
     for (j = 0; j < obj->cols; j++) {
-      if (TC_IS_BLOCK(tg_get(obj, i, j))) {
-        wmove(w, 1 + i, 1 + j*CELLS_PER_BLOCK);
-        TC_BLOCK_CURS(w,tg_get(obj, i, j));
+      if (TC_IS_FILLED(tg_get(obj, i, j))) {
+        wmove(w, 1 + i, 1 + j*COLS_PER_CELL);
+        ADD_BLOCK(w,tg_get(obj, i, j));
       }
     }
   }
   wrefresh(w);
 }
 
+/*
+  Display a tetris piece in a dedicated window.
+*/
 void display_piece(WINDOW *w, tetris_block block)
 {
   int b;
@@ -53,12 +69,15 @@ void display_piece(WINDOW *w, tetris_block block)
   }
   for (b = 0; b < TETRIS; b++) {
     c = TETROMINOS[block.typ][block.ori][b];
-    wmove(w, c.row + 1, c.col * CELLS_PER_BLOCK + 1);
-    TC_BLOCK_CURS(w, TET_TO_BLCK(block.typ));
+    wmove(w, c.row + 1, c.col * COLS_PER_CELL + 1);
+    ADD_BLOCK(w, TYPE_TO_CELL(block.typ));
   }
   wrefresh(w);
 }
 
+/*
+  Display score information in a dedicated window.
+ */
 void display_score(WINDOW *w, tetris_game *tg)
 {
   wclear(w);
@@ -70,6 +89,9 @@ void display_score(WINDOW *w, tetris_game *tg)
   wrefresh(w);
 }
 
+/*
+  Boss mode!  Make it look like you're doing work.
+ */
 void boss_mode(void)
 {
   clear();
@@ -96,6 +118,9 @@ void boss_mode(void)
   noecho();
 }
 
+/*
+  Save and exit the game.
+ */
 void save(tetris_game *game, WINDOW *w)
 {
   FILE *f;
@@ -118,19 +143,25 @@ void save(tetris_game *game, WINDOW *w)
   exit(EXIT_SUCCESS);
 }
 
+/*
+  Do the NCURSES initialization steps for color blocks.
+ */
 void init_colors(void)
 {
   start_color();
   //init_color(COLOR_ORANGE, 1000, 647, 0);
-  init_pair(TC_BLCKI, COLOR_CYAN, COLOR_BLACK);
-  init_pair(TC_BLCKJ, COLOR_BLUE, COLOR_BLACK);
-  init_pair(TC_BLCKL, COLOR_WHITE, COLOR_BLACK);
-  init_pair(TC_BLCKO, COLOR_YELLOW, COLOR_BLACK);
-  init_pair(TC_BLCKS, COLOR_GREEN, COLOR_BLACK);
-  init_pair(TC_BLCKT, COLOR_MAGENTA, COLOR_BLACK);
-  init_pair(TC_BLCKZ, COLOR_RED, COLOR_BLACK);
+  init_pair(TC_CELLI, COLOR_CYAN, COLOR_BLACK);
+  init_pair(TC_CELLJ, COLOR_BLUE, COLOR_BLACK);
+  init_pair(TC_CELLL, COLOR_WHITE, COLOR_BLACK);
+  init_pair(TC_CELLO, COLOR_YELLOW, COLOR_BLACK);
+  init_pair(TC_CELLS, COLOR_GREEN, COLOR_BLACK);
+  init_pair(TC_CELLT, COLOR_MAGENTA, COLOR_BLACK);
+  init_pair(TC_CELLZ, COLOR_RED, COLOR_BLACK);
 }
 
+/*
+  Main tetris game!
+ */
 int main(int argc, char **argv)
 {
   tetris_game *tg;
@@ -138,6 +169,7 @@ int main(int argc, char **argv)
   bool running = true;
   WINDOW *board, *next, *hold, *score;
 
+  // Load file if given a filename.
   if (argc >= 2) {
     FILE *f = fopen(argv[1], "r");
     if (f == NULL) {
@@ -147,6 +179,7 @@ int main(int argc, char **argv)
     tg = tg_load(f);
     fclose(f);
   } else {
+    // Otherwise create new game.
     tg = tg_create(22, 10);
   }
 
@@ -159,6 +192,7 @@ int main(int argc, char **argv)
   curs_set(0);           // set the cursor to invisible
   init_colors();         // setup tetris colors
 
+  // Create windows for each section of the interface.
   board = newwin(tg->rows + 2, 2 * tg->cols + 2, 0, 0);
   next  = newwin(6, 10, 0, 2 * (tg->cols + 1) + 1);
   hold  = newwin(6, 10, 7, 2 * (tg->cols + 1) + 1);
@@ -166,7 +200,6 @@ int main(int argc, char **argv)
 
   // Game loop
   while (running) {
-    move(0,0);
     running = tg_tick(tg, move);
     display_board(board, tg);
     display_piece(next, tg->next);

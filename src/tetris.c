@@ -18,9 +18,11 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
-#include <ncurses.h>
 
 #include "tetris.h"
+
+#define MAX(X,Y) ((X) > (Y) ? (X) : (Y))
+#define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
 
 /*******************************************************************************
 
@@ -112,7 +114,7 @@ static void tg_put(tetris_game *obj, tetris_block block)
   for (i = 0; i < TETRIS; i++) {
     tetris_location cell = TETROMINOS[block.typ][block.ori][i];
     tg_set(obj, block.loc.row + cell.row, block.loc.col + cell.col,
-           TET_TO_BLCK(block.typ));
+           TYPE_TO_CELL(block.typ));
   }
 }
 
@@ -138,7 +140,7 @@ static bool tg_fits(tetris_game *obj, tetris_block block)
     tetris_location cell = TETROMINOS[block.typ][block.ori][i];
     r = block.loc.row + cell.row;
     c = block.loc.col + cell.col;
-    if (!tg_check(obj, r, c) || TC_IS_BLOCK(tg_get(obj, r, c))) {
+    if (!tg_check(obj, r, c) || TC_IS_FILLED(tg_get(obj, r, c))) {
       return false;
     }
   }
@@ -379,7 +381,7 @@ static bool tg_game_over(tetris_game *obj)
   tg_remove(obj, obj->falling);
   for (i = 0; i < 2; i++) {
     for (j = 0; j < obj->cols; j++) {
-      if (TC_IS_BLOCK(tg_get(obj, i, j))) {
+      if (TC_IS_FILLED(tg_get(obj, i, j))) {
         over = true;
       }
     }

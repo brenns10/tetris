@@ -19,26 +19,39 @@
 #include <stdio.h> // for FILE
 #include <stdbool.h> // for bool
 
-#define MAX(X,Y) ((X) > (Y) ? (X) : (Y))
-#define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
+/*
+  Convert a tetromino type to its corresponding cell.
+ */
+#define TYPE_TO_CELL(x) ((x)+1)
 
-#define TETRIS 4
-
-#define TET_TO_BLCK(x) ((x)+1)
-
-#define CELLS_PER_BLOCK 2
+/*
+  Strings for how you would print a tetris board.
+ */
 #define TC_EMPTY_STR " "
 #define TC_BLOCK_STR "\u2588"
-#define TC_EMPTY_CURS(w) waddch(w,' '); waddch(w,' ')
-#define TC_BLOCK_CURS(w,x) waddch((w),' '|A_REVERSE|COLOR_PAIR(x));     \
-                           waddch((w),' '|A_REVERSE|COLOR_PAIR(x))
 
+/*
+  Questions about a tetris cell.
+ */
 #define TC_IS_EMPTY(x) ((x) == TC_EMPTY)
-#define TC_IS_BLOCK(x) (!TC_IS_EMPTY(x))
+#define TC_IS_FILLED(x) (!TC_IS_EMPTY(x))
 
+/*
+  How many cells in a tetromino?
+ */
+#define TETRIS 4
+/*
+  How many tetrominos?
+ */
 #define NUM_TETROMINOS 7
+/*
+  How many orientations of a tetromino?
+ */
 #define NUM_ORIENTATIONS 4
 
+/*
+  Level constants.
+ */
 #define MAX_LEVEL 19
 #define LINES_PER_LEVEL 10
 
@@ -46,7 +59,7 @@
   A "cell" is a 1x1 block within a tetris board.
  */
 typedef enum {
-  TC_EMPTY, TC_BLCKI, TC_BLCKJ, TC_BLCKL, TC_BLCKO, TC_BLCKS, TC_BLCKT, TC_BLCKZ
+  TC_EMPTY, TC_CELLI, TC_CELLJ, TC_CELLL, TC_CELLO, TC_CELLS, TC_CELLT, TC_CELLZ
 } tetris_cell;
 
 /*

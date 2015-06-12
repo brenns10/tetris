@@ -225,6 +225,8 @@ int main(int argc, char **argv)
       break;
     case 'p':
       wclear(board);
+      box(board, 0, 0);
+      wmove(board, tg->rows/2, (tg->cols*COLS_PER_CELL-6)/2);
       wprintw(board, "PAUSED");
       wrefresh(board);
       timeout(-1);
@@ -249,13 +251,9 @@ int main(int argc, char **argv)
   }
 
   wclear(stdscr);
-  printw("Game over!\n");
-  printw("You finished with %d points on level %d.\n", tg->points, tg->level);
-  printw("Press any key to exit.");
-  refresh();
-  timeout(-1);
-  getch();
   endwin();
+  printf("Game over!\n");
+  printf("You finished with %d points on level %d.\n", tg->points, tg->level);
   tg_delete(tg);
   return 0;
 }

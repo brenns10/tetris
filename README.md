@@ -14,19 +14,21 @@ To build, all you need to do is run `make`.  Then run `bin/release/main` to play
 the game.
 
 The controls are typical of Tetris:
-* `left` and `right`: move the tetromino,
-* `up`: rotates (clockwise?) the tetromino,
-* `down`: immediately drops the tetromino (not a fast drop, an immediate drop),
-* `q`: exit the game prematurely,
-* `p`: pause the game (any key to resume),
-* `b`: "boss mode" - shows a mock terminal screen to fool nosy onlookers.  Hit
+* `left` and `right`: Move the tetromino,
+* `up`: Rotate (clockwise?) the tetromino,
+* `down`: Immediately drop the tetromino (not a fast drop, an immediate drop),
+* `q`: Exit the game prematurely,
+* `p`: Pause the game (any key to resume),
+* `b`: "Boss mode" - show a mock terminal screen to fool nosy onlookers.  Hit
   `F1` to resume the game afterwards.
+* `s`: Save game and exit (just assumes filename `tetris.save`).  To resume the
+  game, run `bin/release/main tetris.save` (or whatever you may have renamed the
+  game save to).
 
 
 Future/Stretch Goals
 --------------------
 
 * Store a block.
-* Save/load games.
 * MIDI Tetris theme song playback.
 * Networked multiplayer!

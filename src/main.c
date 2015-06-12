@@ -32,6 +32,7 @@
  */
 #define ADD_BLOCK(w,x) waddch((w),' '|A_REVERSE|COLOR_PAIR(x));     \
                        waddch((w),' '|A_REVERSE|COLOR_PAIR(x))
+#define ADD_EMPTY(w) waddch((w), ' '); waddch((w), ' ')
 
 /*
   Print the tetris board onto the ncurses window.
@@ -39,18 +40,18 @@
 void display_board(WINDOW *w, tetris_game *obj)
 {
   int i, j;
-  wclear(w);
   box(w, 0, 0);
-  wmove(w,1,1);
   for (i = 0; i < obj->rows; i++) {
+    wmove(w, 1 + i, 1);
     for (j = 0; j < obj->cols; j++) {
       if (TC_IS_FILLED(tg_get(obj, i, j))) {
-        wmove(w, 1 + i, 1 + j*COLS_PER_CELL);
         ADD_BLOCK(w,tg_get(obj, i, j));
+      } else {
+        ADD_EMPTY(w);
       }
     }
   }
-  wrefresh(w);
+  wnoutrefresh(w);
 }
 
 /*
@@ -63,7 +64,7 @@ void display_piece(WINDOW *w, tetris_block block)
   wclear(w);
   box(w, 0, 0);
   if (block.typ == -1) {
-    wrefresh(w);
+    wnoutrefresh(w);
     return;
   }
   for (b = 0; b < TETRIS; b++) {
@@ -71,7 +72,7 @@ void display_piece(WINDOW *w, tetris_block block)
     wmove(w, c.row + 1, c.col * COLS_PER_CELL + 1);
     ADD_BLOCK(w, TYPE_TO_CELL(block.typ));
   }
-  wrefresh(w);
+  wnoutrefresh(w);
 }
 
 /*
@@ -84,7 +85,7 @@ void display_score(WINDOW *w, tetris_game *tg)
   wprintw(w, "Score\n%d\n", tg->points);
   wprintw(w, "Level\n%d\n", tg->level);
   wprintw(w, "Lines\n%d\n", tg->lines_remaining);
-  wrefresh(w);
+  wnoutrefresh(w);
 }
 
 /*
@@ -125,6 +126,8 @@ void save(tetris_game *game, WINDOW *w)
   FILE *f;
 
   wclear(w);
+  box(w, 0, 0); // return the border
+  wmove(w, 1, 1);
   wprintw(w, "Save and exit? [Y/n] ");
   wrefresh(w);
   timeout(-1);
@@ -204,6 +207,7 @@ int main(int argc, char **argv)
     display_piece(next, tg->next);
     display_piece(hold, tg->stored);
     display_score(score, tg);
+    doupdate();
     sleep_milli(10);
 
     switch (getch()) {

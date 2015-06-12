@@ -40,8 +40,7 @@ void display_board(WINDOW *w, tetris_game *obj)
 {
   int i, j;
   wclear(w);
-  wborder(w, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE,
-          ACS_ULCORNER, ACS_URCORNER, ACS_LLCORNER, ACS_LRCORNER);
+  box(w, 0, 0);
   wmove(w,1,1);
   for (i = 0; i < obj->rows; i++) {
     for (j = 0; j < obj->cols; j++) {
@@ -81,8 +80,7 @@ void display_piece(WINDOW *w, tetris_block block)
 void display_score(WINDOW *w, tetris_game *tg)
 {
   wclear(w);
-  wborder(w, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE,
-          ACS_ULCORNER, ACS_URCORNER, ACS_LLCORNER, ACS_LRCORNER);
+  box(w, 0, 0);
   wprintw(w, "Score\n%d\n", tg->points);
   wprintw(w, "Level\n%d\n", tg->level);
   wprintw(w, "Lines\n%d\n", tg->lines_remaining);

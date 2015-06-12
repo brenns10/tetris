@@ -114,6 +114,7 @@ void boss_mode(void)
   while (getch() != KEY_F(1));
   timeout(0);
   noecho();
+  clear();
 }
 
 /*

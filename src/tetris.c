@@ -374,10 +374,10 @@ void tg_curses(tetris_game *obj)
   // Top border and border around next block.
   move(0,0);
   addch(ACS_ULCORNER);
-  for (i = 0; i < obj->cols; i++)
+  for (i = 0; i < obj->cols*CELLS_PER_BLOCK; i++)
     addch(ACS_HLINE);
   addch(ACS_TTEE);
-  for (i = 0; i < TETRIS; i++)
+  for (i = 0; i < TETRIS*CELLS_PER_BLOCK; i++)
     addch(ACS_HLINE);
   addch(ACS_URCORNER);
   addch('\n');
@@ -390,9 +390,9 @@ void tg_curses(tetris_game *obj)
     // game cells
     for (j = 0; j < obj->cols; j++) {
       if (TG_IS_EMPTY(tg_get(obj, i, j))) {
-        addch(TG_EMPTY_CURS);
+        TG_EMPTY_CURS;
       } else {
-        addch(TG_BLOCK_CURS(tg_get(obj, i, j)));
+        TG_BLOCK_CURS(tg_get(obj, i, j));
       }
     }
 
@@ -405,19 +405,20 @@ void tg_curses(tetris_game *obj)
         for (b = 0; b < TETRIS; b++) {
           tetris_location c = TETROMINOS[obj->next.typ][obj->next.ori][b];
           if (c.row == i && c.col == j) {
-            addch(TG_BLOCK_CURS(TET_TO_BLCK(obj->next.typ)));
+            TG_BLOCK_CURS(TET_TO_BLCK(obj->next.typ));
             displayed = true;
           }
         }
-        if (!displayed)
-          addch(TG_EMPTY_CURS);
+        if (!displayed) {
+          TG_EMPTY_CURS;
+        }
       }
       // right border
       addch(ACS_VLINE);
     } else if (i == 4) {
       // fill border under next block space
       addch(ACS_LTEE);
-      for (j = 0; j < TETRIS; j++) {
+      for (j = 0; j < TETRIS * CELLS_PER_BLOCK; j++) {
         addch(ACS_HLINE);
       }
       addch(ACS_LRCORNER);
@@ -448,7 +449,7 @@ void tg_curses(tetris_game *obj)
 
   // Lower border
   addch(ACS_LLCORNER);
-  for (i = 0; i < obj->cols; i++)
+  for (i = 0; i < obj->cols*CELLS_PER_BLOCK; i++)
     addch(ACS_HLINE);
   addch(ACS_LRCORNER);
   refresh();

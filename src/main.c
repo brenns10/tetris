@@ -32,9 +32,9 @@ void display_board(WINDOW *w, tetris_game *obj)
   wmove(w,1,1);
   for (i = 0; i < obj->rows; i++) {
     for (j = 0; j < obj->cols; j++) {
-      if (TG_IS_BLOCK(tg_get(obj, i, j))) {
+      if (TC_IS_BLOCK(tg_get(obj, i, j))) {
         wmove(w, 1 + i, 1 + j*CELLS_PER_BLOCK);
-        TG_BLOCK_CURS(w,tg_get(obj, i, j));
+        TC_BLOCK_CURS(w,tg_get(obj, i, j));
       }
     }
   }
@@ -54,7 +54,7 @@ void display_piece(WINDOW *w, tetris_block block)
   for (b = 0; b < TETRIS; b++) {
     c = TETROMINOS[block.typ][block.ori][b];
     wmove(w, c.row + 1, c.col * CELLS_PER_BLOCK + 1);
-    TG_BLOCK_CURS(w, TET_TO_BLCK(block.typ));
+    TC_BLOCK_CURS(w, TET_TO_BLCK(block.typ));
   }
   wrefresh(w);
 }
@@ -122,13 +122,13 @@ void init_colors(void)
 {
   start_color();
   //init_color(COLOR_ORANGE, 1000, 647, 0);
-  init_pair(TG_BLCKI, COLOR_CYAN, COLOR_BLACK);
-  init_pair(TG_BLCKJ, COLOR_BLUE, COLOR_BLACK);
-  init_pair(TG_BLCKL, COLOR_WHITE, COLOR_BLACK);
-  init_pair(TG_BLCKO, COLOR_YELLOW, COLOR_BLACK);
-  init_pair(TG_BLCKS, COLOR_GREEN, COLOR_BLACK);
-  init_pair(TG_BLCKT, COLOR_MAGENTA, COLOR_BLACK);
-  init_pair(TG_BLCKZ, COLOR_RED, COLOR_BLACK);
+  init_pair(TC_BLCKI, COLOR_CYAN, COLOR_BLACK);
+  init_pair(TC_BLCKJ, COLOR_BLUE, COLOR_BLACK);
+  init_pair(TC_BLCKL, COLOR_WHITE, COLOR_BLACK);
+  init_pair(TC_BLCKO, COLOR_YELLOW, COLOR_BLACK);
+  init_pair(TC_BLCKS, COLOR_GREEN, COLOR_BLACK);
+  init_pair(TC_BLCKT, COLOR_MAGENTA, COLOR_BLACK);
+  init_pair(TC_BLCKZ, COLOR_RED, COLOR_BLACK);
 }
 
 int main(int argc, char **argv)

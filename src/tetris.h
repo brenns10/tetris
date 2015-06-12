@@ -24,73 +24,109 @@
 
 #define TETRIS 4
 
-#define TG_EMPTY   0
-#define TG_BLCKI   1
-#define TG_BLCKJ   2
-#define TG_BLCKL   3
-#define TG_BLCKO   4
-#define TG_BLCKS   5
-#define TG_BLCKT   6
-#define TG_BLCKZ   7
-
 #define TET_TO_BLCK(x) ((x)+1)
 
-#define TG_IS_EMPTY(x) ((x) == TG_EMPTY)
-#define TG_IS_BLOCK(x) (!TG_IS_EMPTY(x))
+#define CELLS_PER_BLOCK 2
+#define TC_EMPTY_STR " "
+#define TC_BLOCK_STR "\u2588"
+#define TC_EMPTY_CURS(w) waddch(w,' '); waddch(w,' ')
+#define TC_BLOCK_CURS(w,x) waddch((w),' '|A_REVERSE|COLOR_PAIR(x));     \
+                           waddch((w),' '|A_REVERSE|COLOR_PAIR(x))
 
-#define TET_I 0
-#define TET_J 1
-#define TET_L 2
-#define TET_O 3
-#define TET_S 4
-#define TET_T 5
-#define TET_Z 6
+#define TC_IS_EMPTY(x) ((x) == TC_EMPTY)
+#define TC_IS_BLOCK(x) (!TC_IS_EMPTY(x))
+
 #define NUM_TETROMINOS 7
 #define NUM_ORIENTATIONS 4
-
-#define CELLS_PER_BLOCK 2
-#define TG_EMPTY_STR " "
-#define TG_BLOCK_STR "\u2588"
-#define TG_EMPTY_CURS(w) waddch(w,' '); waddch(w,' ')
-#define TG_BLOCK_CURS(w,x) waddch((w),' '|A_REVERSE|COLOR_PAIR(x));     \
-                           waddch((w),' '|A_REVERSE|COLOR_PAIR(x))
 
 #define MAX_LEVEL 19
 #define LINES_PER_LEVEL 10
 
+/*
+  A "cell" is a 1x1 block within a tetris board.
+ */
+typedef enum {
+  TC_EMPTY, TC_BLCKI, TC_BLCKJ, TC_BLCKL, TC_BLCKO, TC_BLCKS, TC_BLCKT, TC_BLCKZ
+} tetris_cell;
+
+/*
+  A "type" is a type/shape of a tetromino.  Not including orientation.
+ */
+typedef enum {
+  TET_I, TET_J, TET_L, TET_O, TET_S, TET_T, TET_Z
+} tetris_type;
+
+/*
+  A row,column pair.  Negative numbers allowed, because we need them for
+  offsets.
+ */
 typedef struct {
   int row;
   int col;
 } tetris_location;
 
+/*
+  A "block" is a struct that contains information about a tetromino.
+  Specifically, what type it is, what orientation it has, and where it is.
+ */
 typedef struct {
-
   int typ;
   int ori;
   tetris_location loc;
-
 } tetris_block;
 
+/*
+  All possible moves to give as input to the game.
+ */
 typedef enum {
   TM_LEFT, TM_RIGHT, TM_CLOCK, TM_COUNTER, TM_DROP, TM_HOLD, TM_NONE
 } tetris_move;
 
+/*
+  A game object!
+ */
 typedef struct {
-
+  /*
+    Game board stuff:
+   */
   int rows;
   int cols;
   char *board;
+  /*
+    Scoring information:
+   */
   int points;
   int level;
+  /*
+    Falling block is the one currently going down.  Next block is the one that
+    will be falling after this one.  Stored is the block that you can swap out.
+   */
   tetris_block falling;
   tetris_block next;
   tetris_block stored;
+  /*
+    Number of game ticks until the block will move down.
+   */
   int ticks_till_gravity;
+  /*
+    Number of lines until you advance to the next level.
+   */
   int lines_remaining;
-
 } tetris_game;
 
+/*
+  This array stores all necessary information about the cells that are filled by
+  each tetromino.  The first index is the type of the tetromino (i.e. shape,
+  e.g. I, J, Z, etc.).  The next index is the orientation (0-3).  The final
+  array contains 4 tetris_location objects, each mapping to an offset from a
+  point on the upper left that is the tetromino "origin".
+ */
 extern tetris_location TETROMINOS[NUM_TETROMINOS][NUM_ORIENTATIONS][TETRIS];
+
+/*
+  This array tells you how many ticks per gravity by level.  Decreases as level
+  increases, to add difficulty.
+ */
 extern int GRAVITY_LEVEL[MAX_LEVEL+1];
 
 // Data structure manipulation.
@@ -101,22 +137,10 @@ void tg_delete(tetris_game *obj);
 tetris_game *tg_load(FILE *f);
 void tg_save(tetris_game *obj, FILE *f);
 
-// Low level cell manipulation.
+// Public methods not related to memory:
 char tg_get(tetris_game *obj, int row, int col);
-void tg_set(tetris_game *obj, int row, int col, char value);
-
-// Tetromino level manipulation.
-void tg_put(tetris_game *obj, tetris_block block);
-void tg_remove(tetris_game *obj, tetris_block block);
+bool tg_check(tetris_game *obj, int row, int col);
 bool tg_tick(tetris_game *obj, tetris_move move);
-
-// printing stuff
 void tg_print(tetris_game *obj, FILE *f);
-void tg_curses(tetris_game *obj);
-void tg_init_colors(void);
-
-// Other stuff
-int random_tetromino(void);
-void tg_init_colors(void);
 
 #endif // TETRIS_H

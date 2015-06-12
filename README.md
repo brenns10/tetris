@@ -29,6 +29,5 @@ The controls are typical of Tetris:
 Future/Stretch Goals
 --------------------
 
-* Store a block.
 * MIDI Tetris theme song playback.
 * Networked multiplayer!

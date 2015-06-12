@@ -38,27 +38,22 @@ endif
 
 # Sources and Objects
 SOURCES=$(shell find src/ -type f -name "*.c")
-SOURCEDIRS=$(shell find src/ -type d)
-
 OBJECTS=$(patsubst src/%.c,obj/$(CFG)/%.o,$(SOURCES))
+DEPS=$(patsubst src/%.c,deps/%.d,$(SOURCES))
 
 # Main targets
 .PHONY: all clean clean_all
 
-all: Makefile.deps bin/$(CFG)/main GTAGS
-
-Makefile.deps: $(SOURCES)
-	$(CC) $(CFLAGS) -MM $(SOURCES) > Makefile.deps
-	make
+all: bin/$(CFG)/main
 
 GTAGS: $(SOURCES)
 	gtags
 
 clean:
-	rm -rf bin/$(CFG)/* obj/$(CFG)/* src/*.gch GTAGS GPATH GRTAGS Makefile.deps
+	rm -rf obj/$(CFG)/* bin/$(CFG)/* src/*.gch GTAGS GPATH GRTAGS
 
 clean_all:
-	rm -rf bin/* obj/*
+	rm -rf bin/* obj/* deps/*
 
 # --- Compile Rule
 obj/$(CFG)/%.o: src/%.c
@@ -70,4 +65,11 @@ bin/$(CFG)/main: $(OBJECTS)
 	$(DIR_GUARD)
 	$(CC) $(LFLAGS) $(OBJECTS) -o bin/$(CFG)/main
 
--include Makefile.deps
+# --- Dependency Rule
+deps/%.d: src/%.c
+	$(DIR_GUARD)
+	$(CC) $(CFLAGS) -MM $< | sed -e 's/~\(.*\)\.o:/\1.d \1.o:/' > $@
+
+ifneq "$(MAKECMDGOALS)" "clean_all"
+-include $(DEPS)
+endif

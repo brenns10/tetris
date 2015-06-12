@@ -1,7 +1,7 @@
 obj
 bin
+deps
 *~
 GTAGS
 GRTAGS
 GPATH
-Makefile.deps

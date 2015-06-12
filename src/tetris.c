@@ -91,6 +91,10 @@ void tg_init(tetris_game *obj, int rows, int cols)
   srand(time(NULL));
   tg_new_falling(obj);
   tg_new_falling(obj);
+  obj->stored.typ = -1;
+  obj->stored.ori = 0;
+  obj->stored.loc.row = 0;
+  obj->next.loc.col = obj->cols/2 - 2;
   printf("%d", obj->falling.loc.col);
 }
 
@@ -244,6 +248,25 @@ static void tg_rotate(tetris_game *obj, int direction)
   tg_put(obj, obj->falling);
 }
 
+static void tg_hold(tetris_game *obj)
+{
+  tg_remove(obj, obj->falling);
+  if (obj->stored.typ == -1) {
+    obj->stored = obj->falling;
+    tg_new_falling(obj);
+  } else {
+    int typ = obj->falling.typ, ori = obj->falling.ori;
+    obj->falling.typ = obj->stored.typ;
+    obj->falling.ori = obj->stored.ori;
+    obj->stored.typ = typ;
+    obj->stored.ori = ori;
+    while (!tg_fits(obj, obj->falling)) {
+      obj->falling.loc.row--;
+    }
+  }
+  tg_put(obj, obj->falling);
+}
+
 static void tg_handle_move(tetris_game *obj, tetris_move move)
 {
   switch (move) {
@@ -261,6 +284,9 @@ static void tg_handle_move(tetris_game *obj, tetris_move move)
     break;
   case TM_COUNTER:
     tg_rotate(obj, -1);
+    break;
+  case TM_HOLD:
+    tg_hold(obj);
     break;
   default:
     // pass

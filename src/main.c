@@ -136,7 +136,7 @@ int main(int argc, char **argv)
   tetris_game *tg;
   tetris_move move = TM_NONE;
   bool running = true;
-  WINDOW *board, *next, *score;
+  WINDOW *board, *next, *hold, *score;
 
   if (argc >= 2) {
     FILE *f = fopen(argv[1], "r");
@@ -161,7 +161,8 @@ int main(int argc, char **argv)
 
   board = newwin(tg->rows + 2, 2 * tg->cols + 2, 0, 0);
   next  = newwin(6, 10, 0, 2 * (tg->cols + 1) + 1);
-  score = newwin(6, 10, 7, 2 * (tg->cols + 1 ) + 1);
+  hold  = newwin(6, 10, 7, 2 * (tg->cols + 1) + 1);
+  score = newwin(6, 10, 14, 2 * (tg->cols + 1 ) + 1);
 
   // Game loop
   while (running) {
@@ -169,6 +170,7 @@ int main(int argc, char **argv)
     running = tg_tick(tg, move);
     display_board(board, tg);
     display_piece(next, tg->next);
+    display_piece(hold, tg->stored);
     display_score(score, tg);
     sleep_milli(10);
 
@@ -205,6 +207,9 @@ int main(int argc, char **argv)
     case 's':
       save(tg, board);
       move = TM_NONE;
+      break;
+    case ' ':
+      move = TM_HOLD;
       break;
     default:
       move = TM_NONE;

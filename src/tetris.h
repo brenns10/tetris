@@ -72,7 +72,7 @@ typedef struct {
 } tetris_block;
 
 typedef enum {
-  TM_LEFT, TM_RIGHT, TM_CLOCK, TM_COUNTER, TM_DROP, TM_NONE
+  TM_LEFT, TM_RIGHT, TM_CLOCK, TM_COUNTER, TM_DROP, TM_HOLD, TM_NONE
 } tetris_move;
 
 typedef struct {
@@ -84,6 +84,7 @@ typedef struct {
   int level;
   tetris_block falling;
   tetris_block next;
+  tetris_block stored;
   int ticks_till_gravity;
   int lines_remaining;
 

@@ -57,6 +57,7 @@ void save(tetris_game *game)
   timeout(-1);
   if (getch() == 'n') {
     timeout(0);
+    clear();
     return;
   }
   f = fopen("tetris.save", "w");

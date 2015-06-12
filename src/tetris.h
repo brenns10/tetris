@@ -51,9 +51,9 @@
 #define CELLS_PER_BLOCK 2
 #define TG_EMPTY_STR " "
 #define TG_BLOCK_STR "\u2588"
-#define TG_EMPTY_CURS addch(' '); addch(' ')
-#define TG_BLOCK_CURS(x) addch(' '|A_REVERSE|COLOR_PAIR(x));\
-                         addch(' '|A_REVERSE|COLOR_PAIR(x))
+#define TG_EMPTY_CURS(w) waddch(w,' '); waddch(w,' ')
+#define TG_BLOCK_CURS(w,x) waddch((w),' '|A_REVERSE|COLOR_PAIR(x));     \
+                           waddch((w),' '|A_REVERSE|COLOR_PAIR(x))
 
 #define MAX_LEVEL 19
 #define LINES_PER_LEVEL 10

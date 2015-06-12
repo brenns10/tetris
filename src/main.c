@@ -23,6 +23,53 @@
 #include "tetris.h"
 #include "util.h"
 
+void display_board(WINDOW *w, tetris_game *obj)
+{
+  int i, j;
+  wclear(w);
+  wborder(w, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE,
+          ACS_ULCORNER, ACS_URCORNER, ACS_LLCORNER, ACS_LRCORNER);
+  wmove(w,1,1);
+  for (i = 0; i < obj->rows; i++) {
+    for (j = 0; j < obj->cols; j++) {
+      if (TG_IS_BLOCK(tg_get(obj, i, j))) {
+        wmove(w, 1 + i, 1 + j*CELLS_PER_BLOCK);
+        TG_BLOCK_CURS(w,tg_get(obj, i, j));
+      }
+    }
+  }
+  wrefresh(w);
+}
+
+void display_piece(WINDOW *w, tetris_block block)
+{
+  int b;
+  tetris_location c;
+  wclear(w);
+  box(w, 0, 0);
+  if (block.typ == -1) {
+    wrefresh(w);
+    return;
+  }
+  for (b = 0; b < TETRIS; b++) {
+    c = TETROMINOS[block.typ][block.ori][b];
+    wmove(w, c.row + 1, c.col * CELLS_PER_BLOCK + 1);
+    TG_BLOCK_CURS(w, TET_TO_BLCK(block.typ));
+  }
+  wrefresh(w);
+}
+
+void display_score(WINDOW *w, tetris_game *tg)
+{
+  wclear(w);
+  wborder(w, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE,
+          ACS_ULCORNER, ACS_URCORNER, ACS_LLCORNER, ACS_LRCORNER);
+  wprintw(w, "Score\n%d\n", tg->points);
+  wprintw(w, "Level\n%d\n", tg->level);
+  wprintw(w, "Lines\n%d\n", tg->lines_remaining);
+  wrefresh(w);
+}
+
 void boss_mode(void)
 {
   clear();
@@ -49,15 +96,16 @@ void boss_mode(void)
   noecho();
 }
 
-void save(tetris_game *game)
+void save(tetris_game *game, WINDOW *w)
 {
   FILE *f;
 
-  printw("\nSave and exit? [Y/n] ");
+  wclear(w);
+  wprintw(w, "Save and exit? [Y/n] ");
+  wrefresh(w);
   timeout(-1);
   if (getch() == 'n') {
     timeout(0);
-    clear();
     return;
   }
   f = fopen("tetris.save", "w");
@@ -70,11 +118,25 @@ void save(tetris_game *game)
   exit(EXIT_SUCCESS);
 }
 
+void init_colors(void)
+{
+  start_color();
+  //init_color(COLOR_ORANGE, 1000, 647, 0);
+  init_pair(TG_BLCKI, COLOR_CYAN, COLOR_BLACK);
+  init_pair(TG_BLCKJ, COLOR_BLUE, COLOR_BLACK);
+  init_pair(TG_BLCKL, COLOR_WHITE, COLOR_BLACK);
+  init_pair(TG_BLCKO, COLOR_YELLOW, COLOR_BLACK);
+  init_pair(TG_BLCKS, COLOR_GREEN, COLOR_BLACK);
+  init_pair(TG_BLCKT, COLOR_MAGENTA, COLOR_BLACK);
+  init_pair(TG_BLCKZ, COLOR_RED, COLOR_BLACK);
+}
+
 int main(int argc, char **argv)
 {
   tetris_game *tg;
   tetris_move move = TM_NONE;
   bool running = true;
+  WINDOW *board, *next, *score;
 
   if (argc >= 2) {
     FILE *f = fopen(argv[1], "r");
@@ -95,13 +157,19 @@ int main(int argc, char **argv)
   keypad(stdscr, TRUE);  // allow arrow keys
   timeout(0);            // no blocking on getch()
   curs_set(0);           // set the cursor to invisible
-  tg_init_colors();      // setup tetris colors
+  init_colors();         // setup tetris colors
+
+  board = newwin(tg->rows + 2, 2 * tg->cols + 2, 0, 0);
+  next  = newwin(6, 10, 0, 2 * (tg->cols + 1) + 1);
+  score = newwin(6, 10, 7, 2 * (tg->cols + 1 ) + 1);
 
   // Game loop
   while (running) {
     move(0,0);
     running = tg_tick(tg, move);
-    tg_curses(tg);
+    display_board(board, tg);
+    display_piece(next, tg->next);
+    display_score(score, tg);
     sleep_milli(10);
 
     switch (getch()) {
@@ -122,8 +190,9 @@ int main(int argc, char **argv)
       move = TM_NONE;
       break;
     case 'p':
-      clear();
-      printw("PAUSED");
+      wclear(board);
+      wprintw(board, "PAUSED");
+      wrefresh(board);
       timeout(-1);
       getch();
       timeout(0);
@@ -134,7 +203,7 @@ int main(int argc, char **argv)
       move = TM_NONE;
       break;
     case 's':
-      save(tg);
+      save(tg, board);
       move = TM_NONE;
       break;
     default:
@@ -142,9 +211,11 @@ int main(int argc, char **argv)
     }
   }
 
-  printw("\nGame over!\n");
+  wclear(stdscr);
+  printw("Game over!\n");
   printw("You finished with %d points on level %d.\n", tg->points, tg->level);
   printw("Press any key to exit.");
+  refresh();
   timeout(-1);
   getch();
   endwin();

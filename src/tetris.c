@@ -112,6 +112,21 @@ void tg_delete(tetris_game *obj) {
   free(obj);
 }
 
+tetris_game *tg_load(FILE *f)
+{
+  tetris_game *obj = malloc(sizeof(tetris_game));
+  fread(obj, sizeof(tetris_game), 1, f);
+  obj->board = malloc(obj->rows * obj->cols);
+  fread(obj->board, sizeof(char), obj->rows * obj->cols, f);
+  return obj;
+}
+
+void tg_save(tetris_game *obj, FILE *f)
+{
+  fwrite(obj, sizeof(tetris_game), 1, f);
+  fwrite(obj->board, sizeof(char), obj->rows * obj->cols, f);
+}
+
 char tg_get(tetris_game *obj, int row, int column)
 {
   return obj->board[obj->cols * row + column];

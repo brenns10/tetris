@@ -14,6 +14,7 @@
 *******************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
 #include <ncurses.h>
@@ -48,11 +49,43 @@ void boss_mode(void)
   noecho();
 }
 
+void save(tetris_game *game)
+{
+  FILE *f;
+
+  printw("\nSave and exit? [Y/n] ");
+  timeout(-1);
+  if (getch() == 'n') {
+    timeout(0);
+    return;
+  }
+  f = fopen("tetris.save", "w");
+  tg_save(game, f);
+  fclose(f);
+  tg_delete(game);
+  endwin();
+  printf("Game saved to \"tetris.save\".\n");
+  printf("Resume by passing the filename as an argument to this program.\n");
+  exit(EXIT_SUCCESS);
+}
+
 int main(int argc, char **argv)
 {
-  tetris_game *tg = tg_create(22, 10);
+  tetris_game *tg;
   tetris_move move = TM_NONE;
   bool running = true;
+
+  if (argc >= 2) {
+    FILE *f = fopen(argv[1], "r");
+    if (f == NULL) {
+      perror("tetris");
+      exit(EXIT_FAILURE);
+    }
+    tg = tg_load(f);
+    fclose(f);
+  } else {
+    tg = tg_create(22, 10);
+  }
 
   // NCURSES initialization:
   initscr();             // initialize curses
@@ -97,6 +130,10 @@ int main(int argc, char **argv)
       break;
     case 'b':
       boss_mode();
+      move = TM_NONE;
+      break;
+    case 's':
+      save(tg);
       move = TM_NONE;
       break;
     default:

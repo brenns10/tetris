@@ -95,6 +95,8 @@ void tg_init(tetris_game *obj, int rows, int cols);
 tetris_game *tg_create(int rows, int cols);
 void tg_destroy(tetris_game *obj);
 void tg_delete(tetris_game *obj);
+tetris_game *tg_load(FILE *f);
+void tg_save(tetris_game *obj, FILE *f);
 
 // Low level cell manipulation.
 char tg_get(tetris_game *obj, int row, int col);

@@ -63,7 +63,7 @@ obj/$(CFG)/%.o: src/%.c
 # --- Link Rule
 bin/$(CFG)/main: $(OBJECTS)
 	$(DIR_GUARD)
-	$(CC) $(LFLAGS) $(OBJECTS) -o bin/$(CFG)/main
+	$(CC) $(OBJECTS) $(LFLAGS) -o bin/$(CFG)/main
 
 # --- Dependency Rule
 deps/%.d: src/%.c

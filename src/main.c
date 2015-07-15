@@ -206,11 +206,9 @@ int main(int argc, char **argv)
   }
   Mix_AllocateChannels(1); // only need background music
   music = Mix_LoadMUS("tetris.mp3");
-  if (!music) {
-    fprintf(stderr, "unable to load music\n");
-    exit(EXIT_FAILURE);
+  if (music) {
+    Mix_PlayMusic(music, -1);
   }
-  Mix_PlayMusic(music, -1);
 
   // NCURSES initialization:
   initscr();             // initialize curses

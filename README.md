@@ -5,13 +5,40 @@ A tetris game in C using NCURSES.  It's pretty feature complete, except for
 stretch goals I may pick up in my free time.
 
 
+Building
+--------
+
+My dependencies are:
+
+* `libsdl` and `libsdl_mixer` 1.2 for sound.
+* `ncurses` for terminal manipulation.
+
+To install them on Arch Linux:
+
+    sudo pacman -S sdl_mixer ncurses
+
+To install them on Ubuntu, I think this will work (but untested):
+
+    sudo apt-get install libsdl-mixer-1.2-dev libncurses5-dev
+
+To compile:
+
+    make
+
+To run:
+
+    bin/release/main
+
+You will need to provide a file named `tetris.mp3` in the same directory that
+you're running the game from.  As I understand it, the official Tetris theme
+song is legally protected in the use of games like this, so I will not be
+providing or linking to that.  But I'm sure you could find something!  (**You do
+not need to provide `tetris.mp3` in order to play the game, only if you want
+sound!**).
+
+
 Instructions
 ------------
-
-If you're on Ubuntu, you may need to `sudo apt-get install libncurses5-dev`.
-
-To build, all you need to do is run `make`.  Then run `bin/release/main` to play
-the game.
 
 The controls are typical of Tetris:
 * `left` and `right`: Move the tetromino,
@@ -29,5 +56,5 @@ The controls are typical of Tetris:
 Future/Stretch Goals
 --------------------
 
-* MIDI Tetris theme song playback.
+* Sound effects (in addition to the theme music).
 * Networked multiplayer!

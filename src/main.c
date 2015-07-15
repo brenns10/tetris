@@ -20,6 +20,9 @@
 #include <ncurses.h>
 #include <string.h>
 
+#include <SDL/SDL.h>
+#include <SDL/SDL_mixer.h>
+
 #include "tetris.h"
 #include "util.h"
 
@@ -94,6 +97,7 @@ void display_score(WINDOW *w, tetris_game *tg)
 void boss_mode(void)
 {
   clear();
+  Mix_PauseMusic();
   printw("user@workstation-312:~/Documents/presentation $ ls -l\n"
          "total 528\n"
          "drwxr-xr-x 2 user users   4096 Jun  9 17:05 .\n"
@@ -116,6 +120,7 @@ void boss_mode(void)
   timeout(0);
   noecho();
   clear();
+  Mix_ResumeMusic();
 }
 
 /*
@@ -170,6 +175,7 @@ int main(int argc, char **argv)
   tetris_move move = TM_NONE;
   bool running = true;
   WINDOW *board, *next, *hold, *score;
+  Mix_Music *music;
 
   // Load file if given a filename.
   if (argc >= 2) {
@@ -184,6 +190,27 @@ int main(int argc, char **argv)
     // Otherwise create new game.
     tg = tg_create(22, 10);
   }
+
+  // Initialize music.
+  if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+    fprintf(stderr, "unable to initialize SDL\n");
+    exit(EXIT_FAILURE);
+  }
+  if (Mix_Init(MIX_INIT_MP3) != MIX_INIT_MP3) {
+    fprintf(stderr, "unable to initialize SDL_mixer\n");
+    exit(EXIT_FAILURE);
+  }
+  if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024) != 0) {
+    fprintf(stderr, "unable to initialize audio\n");
+    exit(EXIT_FAILURE);
+  }
+  Mix_AllocateChannels(1); // only need background music
+  music = Mix_LoadMUS("tetris.mp3");
+  if (!music) {
+    fprintf(stderr, "unable to load music\n");
+    exit(EXIT_FAILURE);
+  }
+  Mix_PlayMusic(music, -1);
 
   // NCURSES initialization:
   initscr();             // initialize curses
@@ -254,10 +281,21 @@ int main(int argc, char **argv)
     }
   }
 
+  // Deinitialize NCurses
   wclear(stdscr);
   endwin();
+
+  // Deinitialize Sound
+  Mix_HaltMusic();
+  Mix_FreeMusic(music);
+  Mix_CloseAudio();
+  Mix_Quit();
+
+  // Output ending message.
   printf("Game over!\n");
   printf("You finished with %d points on level %d.\n", tg->points, tg->level);
+
+  // Deinitialize Tetris
   tg_delete(tg);
   return 0;
 }

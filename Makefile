@@ -17,8 +17,8 @@
 CC=gcc
 FLAGS=-Wall -pedantic
 INC=-Isrc/
-CFLAGS=$(FLAGS) -c -g --std=c99 $(INC)
-LFLAGS=$(FLAGS) -lncurses
+CFLAGS=$(FLAGS) -c -g --std=c99 $(INC) `sdl-config --cflags`
+LFLAGS=$(FLAGS) -lncurses `sdl-config --libs` -lSDL_mixer
 DIR_GUARD=@mkdir -p $(@D)
 
 # Build configurations.

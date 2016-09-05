@@ -17,9 +17,9 @@ To install them on Arch Linux:
 
     sudo pacman -S sdl_mixer ncurses
 
-To install them on Ubuntu, I think this will work (but untested):
+To install them on Ubuntu:
 
-    sudo apt-get install libsdl-mixer-1.2-dev libncurses5-dev
+    sudo apt-get install libsdl-mixer1.2-dev libncurses5-dev
 
 To compile:
 

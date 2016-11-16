@@ -1,6 +1,8 @@
 Tetris
 ======
 
+![tetris.gif](tetris.gif)
+
 A tetris game in C using NCURSES.  It's pretty feature complete, except for
 stretch goals I may pick up in my free time.
 

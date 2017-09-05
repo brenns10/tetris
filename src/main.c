@@ -20,8 +20,10 @@
 #include <ncurses.h>
 #include <string.h>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_mixer.h>
+#if WITH_SDL
+# include <SDL/SDL.h>
+# include <SDL/SDL_mixer.h>
+#endif
 
 #include "tetris.h"
 #include "util.h"
@@ -97,7 +99,9 @@ void display_score(WINDOW *w, tetris_game *tg)
 void boss_mode(void)
 {
   clear();
+#if WITH_SDL
   Mix_PauseMusic();
+#endif
   printw("user@workstation-312:~/Documents/presentation $ ls -l\n"
          "total 528\n"
          "drwxr-xr-x 2 user users   4096 Jun  9 17:05 .\n"
@@ -120,7 +124,9 @@ void boss_mode(void)
   timeout(0);
   noecho();
   clear();
+#if WITH_SDL
   Mix_ResumeMusic();
+#endif
 }
 
 /*
@@ -175,7 +181,9 @@ int main(int argc, char **argv)
   tetris_move move = TM_NONE;
   bool running = true;
   WINDOW *board, *next, *hold, *score;
+#if WITH_SDL
   Mix_Music *music;
+#endif
 
   // Load file if given a filename.
   if (argc >= 2) {
@@ -190,6 +198,8 @@ int main(int argc, char **argv)
     // Otherwise create new game.
     tg = tg_create(22, 10);
   }
+
+#if WITH_SDL
 
   // Initialize music.
   if (SDL_Init(SDL_INIT_AUDIO) < 0) {
@@ -209,6 +219,8 @@ int main(int argc, char **argv)
   if (music) {
     Mix_PlayMusic(music, -1);
   }
+
+#endif
 
   // NCURSES initialization:
   initscr();             // initialize curses
@@ -283,11 +295,15 @@ int main(int argc, char **argv)
   wclear(stdscr);
   endwin();
 
+#if WITH_SDL
+
   // Deinitialize Sound
   Mix_HaltMusic();
   Mix_FreeMusic(music);
   Mix_CloseAudio();
   Mix_Quit();
+
+#endif
 
   // Output ending message.
   printf("Game over!\n");

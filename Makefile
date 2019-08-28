@@ -17,8 +17,8 @@
 CC=gcc
 FLAGS=-Wall -pedantic
 INC=-Isrc/
-CFLAGS=$(FLAGS) -c -g --std=c99 $(INC) `sdl-config --cflags`
-LFLAGS=$(FLAGS) -lncurses `sdl-config --libs` -lSDL_mixer
+CFLAGS=$(FLAGS) -c -g --std=c99 $(INC)
+LFLAGS=$(FLAGS) -lncurses
 DIR_GUARD=@mkdir -p $(@D)
 
 # Build configurations.
@@ -32,6 +32,21 @@ ifneq ($(CFG),release)
 	@echo "You must specify a configuration when running make, e.g."
 	@echo "  make CFG=debug"
 	@echo "Choices are 'release', 'debug'."
+	@exit 1
+endif
+endif
+
+SDL=yes
+ifeq ($(SDL),yes)
+CFLAGS += `sdl-config --cflags` -DWITH_SDL=1
+LFLAGS += `sdl-config --libs` -lSDL_mixer
+endif
+ifneq ($(SDL),yes)
+ifneq ($(SDL),no)
+	@echo "Invalid SDL configuration "$(SDL)" specified."
+	@echo "You must specify the SDL configuration when running make, e.g."
+	@echo "  make SDL=yes"
+	@echo "Choices are 'yes', 'no'."
 	@exit 1
 endif
 endif

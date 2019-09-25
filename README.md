@@ -43,14 +43,14 @@ Instructions
 ------------
 
 The controls are typical of Tetris:
-* `left` and `right`: Move the tetromino,
-* `up`: Rotate (clockwise?) the tetromino,
-* `down`: Immediately drop the tetromino (not a fast drop, an immediate drop),
-* `q`: Exit the game prematurely,
-* `p`: Pause the game (any key to resume),
-* `b`: "Boss mode" - show a mock terminal screen to fool nosy onlookers.  Hit
-  `F1` to resume the game afterwards.
-* `s`: Save game and exit (just assumes filename `tetris.save`).  To resume the
+* <kbd>←</kbd> and <kbd>→</kbd>: Move the tetromino,
+* <kbd>↑</kbd>: Rotate (clockwise?) the tetromino,
+* <kbd>↓</kbd>: Immediately drop the tetromino (not a fast drop, an immediate drop),
+* <kbd>Q</kbd>: Exit the game prematurely,
+* <kbd>P</kbd>: Pause the game (any key to resume),
+* <kbd>B</kbd>: "Boss mode" - show a mock terminal screen to fool nosy onlookers.  Hit
+  <kbd>F1</kbd> to resume the game afterwards.
+* <kbd>S</kbd>: Save game and exit (just assumes filename `tetris.save`).  To resume the
   game, run `bin/release/main tetris.save` (or whatever you may have renamed the
   game save to).
 
